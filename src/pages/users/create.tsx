@@ -8,6 +8,7 @@ import {
   SimpleGrid,
   VStack,
 } from "@chakra-ui/react";
+import NextLink from "next/link";
 import { Input } from "../../components/Form/Input";
 import { Header } from "../../components/Header";
 import Sidebar from "../../components/Sidebar";
@@ -44,7 +45,9 @@ export default function CreateUser() {
 
           <Flex mt="8" justify="flex-end">
             <HStack spacing="4">
-              <Button colorScheme="whiteAlpha">Cancelar</Button>
+              <NextLink href="/users" passHref>
+                <Button colorScheme="whiteAlpha">Cancelar</Button>
+              </NextLink>
               <Button colorScheme="pink">Salvar</Button>
             </HStack>
           </Flex>

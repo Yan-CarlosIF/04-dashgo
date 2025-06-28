@@ -38,7 +38,7 @@ export default function UserList() {
             <Heading size="lg" fontWeight="normal">
               Usuários
             </Heading>
-            <NextLink href="#" passHref>
+            <NextLink href="/users/create" passHref>
               <Button
                 as="a"
                 size="sm"
