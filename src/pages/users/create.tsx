@@ -10,11 +10,15 @@ import {
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import NextLink from "next/link";
+import { useRouter } from "next/router";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { useMutation } from "react-query";
 import { z } from "zod";
 import { Input } from "../../components/Form/Input";
 import { Header } from "../../components/Header";
 import Sidebar from "../../components/Sidebar";
+import { api } from "../../services/axios";
+import { queryClient } from "../../services/queryClient";
 
 const createUserFormSchema = z
   .object({
@@ -34,17 +38,38 @@ const createUserFormSchema = z
 type CreateUserFormData = z.infer<typeof createUserFormSchema>;
 
 export default function CreateUser() {
+  const router = useRouter();
+
+  const { mutateAsync: createUser } = useMutation(
+    async (data: CreateUserFormData) => {
+      await api.post("users", {
+        user: {
+          ...data,
+          createdAt: new Date(),
+        },
+      });
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("users");
+
+        router.push("/users");
+      },
+    }
+  );
+
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
+    reset,
   } = useForm<CreateUserFormData>({
     resolver: zodResolver(createUserFormSchema),
   });
 
   const handleCreateUser: SubmitHandler<CreateUserFormData> = async (data) => {
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log(data);
+    await createUser(data);
+    reset();
   };
 
   return (
