@@ -1,7 +1,43 @@
-import { Box, HStack, Stack } from "@chakra-ui/react";
+import { Box, HStack, Icon, Stack } from "@chakra-ui/react";
 import { PaginationItem } from "./PaginationItem";
+import { BsThreeDots } from "react-icons/bs";
 
-export function Pagination() {
+interface PaginationProps {
+  totalCountOfRegisters: number;
+  registersPerPage?: number;
+  currentPage?: number;
+  onPageChange: (page: number) => void;
+}
+
+const siblingsCount = 1;
+
+function generatePagesArray(from: number, to: number) {
+  return [...new Array(to - from)]
+    .map((_, index) => from + index + 1)
+    .filter((page) => page > 0);
+}
+
+export function Pagination({
+  totalCountOfRegisters,
+  registersPerPage = 10,
+  currentPage = 1,
+  onPageChange,
+}: PaginationProps) {
+  const lastPage = Math.ceil(totalCountOfRegisters / registersPerPage);
+
+  const previousPages =
+    currentPage > 1
+      ? generatePagesArray(currentPage - 1 - siblingsCount, currentPage - 1)
+      : [];
+
+  const nextPages =
+    currentPage < lastPage
+      ? generatePagesArray(
+          currentPage,
+          Math.min(currentPage + siblingsCount, lastPage)
+        )
+      : [];
+
   return (
     <Stack
       direction={["column", "row"]}
@@ -15,10 +51,55 @@ export function Pagination() {
       </Box>
 
       <HStack spacing="2">
-        <PaginationItem isCurrent number={1} />
-        <PaginationItem number={2} />
-        <PaginationItem number={3} />
-        <PaginationItem number={4} />
+        {currentPage > 1 + siblingsCount && (
+          <>
+            <PaginationItem number={1} onPageChange={onPageChange} />
+            {currentPage > 2 + siblingsCount && (
+              <Icon
+                as={BsThreeDots}
+                alignSelf="flex-end"
+                color="gray.300"
+                w="8"
+              />
+            )}
+          </>
+        )}
+
+        {previousPages.length > 0 &&
+          previousPages.map((page) => (
+            <PaginationItem
+              key={page}
+              number={page}
+              onPageChange={onPageChange}
+            />
+          ))}
+        <PaginationItem
+          isCurrent
+          number={currentPage}
+          onPageChange={onPageChange}
+        />
+        {nextPages.length > 0 &&
+          nextPages.map((page) => (
+            <PaginationItem
+              key={page}
+              number={page}
+              onPageChange={onPageChange}
+            />
+          ))}
+
+        {currentPage + siblingsCount < lastPage && (
+          <>
+            {currentPage + 1 + siblingsCount < lastPage && (
+              <Icon
+                as={BsThreeDots}
+                alignSelf="flex-end"
+                color="gray.300"
+                w="8"
+              />
+            )}
+            <PaginationItem number={lastPage} onPageChange={onPageChange} />
+          </>
+        )}
       </HStack>
     </Stack>
   );
